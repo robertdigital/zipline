@@ -163,7 +163,7 @@ jobs:
 
           echo
           echo TEST ZIPLINE INSTALL IN NEW ENV
-          git fetch --unshallow --tags
+          git fetch --tags
           exec 3>&1; ZP_OUT=$(conda build conda/zipline --python=$CONDA_PY --numpy=$CONDA_NPY -c quantopian -c quantopian/label/ci | tee >(cat - >&3))
           ZP_OUTPUT=$(echo "$ZP_OUT" | grep "anaconda upload " | awk '{print $NF}')
           echo
