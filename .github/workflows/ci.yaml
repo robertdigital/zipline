@@ -1,10 +1,9 @@
 name: Zipline CI
 
-on:  # TMP: change workflow to run on push to master
+on:  # TMP: change workflow to run on pull request, push to master
   push:
     branches:
       - gh-actions-ci
-
 jobs:
   build-and-test:
     runs-on: ubuntu-16.04
@@ -27,18 +26,17 @@ jobs:
             SCIPY_VERSION: 1.0.0
             PANDAS_DATAREADER_VERSION: 0.4.0
             DASK_VERSION: 0.17.1
-
-
     name: py ${{ matrix.python }}/${{ matrix.pandas }} pandas
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - run: |
+      - name: Unshallow clone
+        run: |
           git fetch --unshallow --tags
       - name: Cache pip directory
         uses: actions/cache@v1
         with:
-          path: /.cache/pip
+          path: ~/.cache/pip
           key: ${{ runner.os }}-${{ matrix.python }}-${{ matrix.pandas }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.python }}-${{ matrix.pandas }}-pip-
@@ -170,17 +168,11 @@ jobs:
           if [ -z "$ZP_OUTPUT" ]; then exit 1; fi
           conda create -n installenv --yes -q --use-local python=$PYTHON_VERSION numpy=$NUMPY_VERSION zipline -c quantopian -c https://conda.anaconda.org/quantopian/label/ci
           if [[ "$DO_UPLOAD" = "true" ]]; then anaconda -t $ANACONDA_TOKEN upload $ZP_OUTPUT -u quantopian --label ci; fi
-
-          echo
-          source activate testenv
-          ls
-
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel: true
-
       - name: Coveralls Finished
         uses: coverallsapp/github-action@master
         with:
