@@ -114,10 +114,6 @@ jobs:
           echo
 
           echo
-          python -c 'import os,sys,fcntl; flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL); fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags&~os.O_NONBLOCK);'
-          echo
-
-          echo
           echo CREATE TEST ENV
           conda create -n testenv --use-local --quiet --yes -c quantopian -c quantopian/label/ci pip python=${{ matrix.python }} numpy=${{ matrix.NUMPY_VERSION }} pandas=${{ matrix.PANDAS_VERSION }} scipy=${{ matrix.SCIPY_VERSION }} ta-lib=$TALIB_VERSION libgfortran=3.0 certifi=$CERTIFI_VERSION
           echo
@@ -134,3 +130,24 @@ jobs:
           echo PIP FREEZE
           pip freeze | sort
           echo
+
+          echo $PATH
+          echo "::set-env name=PATH::$PATH"
+
+      - name: Linting/Tests
+        run: |
+          echo
+          echo ACTIVATE TEST ENV
+          source activate testenv
+          echo
+
+          echo
+          echo FLAKE8
+          flake8 zipline tests
+          echo
+
+          echo
+          echo NOSETESTS
+          nosetests --with-coverage
+          echo
+          source deactivate
