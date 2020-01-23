@@ -33,11 +33,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
-      - name: Cache pip files
+      - name: Cache pip directory
         uses: actions/cache@v1
         with:
-          path: ~/.cache/.pip
-          key: ${{ matrix.python }}/${{ matrix.pandas }}
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ matrix.python }}-${{ matrix.pandas }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python }}-${{ matrix.pandas }}-pip-
       - name: Install dependencies
         env:
           ANACONDA_TOKEN: ${{ secrets.AnacondaToken }}
