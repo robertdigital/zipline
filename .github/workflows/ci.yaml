@@ -169,3 +169,9 @@ jobs:
           if [ -z "$ZP_OUTPUT" ]; then exit 1; fi
           conda create -n installenv --yes -q --use-local python=$PYTHON_VERSION numpy=$NUMPY_VERSION zipline -c quantopian -c https://conda.anaconda.org/quantopian/label/ci
           if [[ "$DO_UPLOAD" = "true" ]]; then anaconda -t $ANACONDA_TOKEN upload $ZP_OUTPUT -u quantopian --label ci; fi
+
+      - name: Coveralls
+        run: |
+          echo COVERALLS
+          source activate testenv
+          coveralls
